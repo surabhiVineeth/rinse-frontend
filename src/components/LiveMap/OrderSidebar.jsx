@@ -11,27 +11,20 @@ const FILTERS = [
   { value: 'cancelled',  label: 'Cancelled' },
 ]
 
-// Haversine ETA (no extra API call) — used for list view
-function calcETA(order) {
-  const valet = order.assigned_valet
-  if (!valet || !['dispatched', 'ready'].includes(order.status)) return null
-
-  const R    = 3958.8
-  const lat1 = valet.latitude  * Math.PI / 180
-  const lat2 = order.latitude  * Math.PI / 180
-  const dLat = (order.latitude  - valet.latitude)  * Math.PI / 180
-  const dLng = (order.longitude - valet.longitude) * Math.PI / 180
-  const a    = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2
-  const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-  const mins = Math.round(Math.max(1, (dist * 1.4 / 25) * 60))
-  return mins
+function fmtETA(seconds) {
+  if (!seconds || seconds <= 0) return null
+  const s = Math.round(seconds)
+  if (s < 60) return `${s}s`
+  const m = Math.floor(s / 60)
+  const rem = s % 60
+  return `${m}:${String(rem).padStart(2, '0')}`
 }
 
 function fmt(ts) {
   return new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
 }
 
-export default function OrderSidebar({ orders, allOrders, statusFilter, onFilterChange, onOrderClick }) {
+export default function OrderSidebar({ orders, allOrders, orderRoutes = {}, statusFilter, onFilterChange, onOrderClick }) {
   const total     = allOrders.length
   const active    = allOrders.filter((o) => !['delivered', 'cancelled'].includes(o.status)).length
   const delivered = allOrders.filter((o) => o.status === 'delivered').length
@@ -82,8 +75,11 @@ export default function OrderSidebar({ orders, allOrders, statusFilter, onFilter
         ) : (
           <ul className="divide-y divide-gray-50">
             {orders.map((order) => {
-              const cfg = STATUS_CONFIG[order.status] ?? {}
-              const eta = calcETA(order)
+              const cfg   = STATUS_CONFIG[order.status] ?? {}
+              const route = orderRoutes[order.id]
+              const eta   = route?.duration_sec
+                ? fmtETA(route.duration_sec * (1 - route.progress))
+                : null
               return (
                 <li key={order.id}>
                   <button
@@ -107,7 +103,7 @@ export default function OrderSidebar({ orders, allOrders, statusFilter, onFilter
                       </span>
                       <div className="flex items-center gap-1.5 text-xs text-gray-400">
                         {eta && (
-                          <span className="font-medium" style={{ color: '#059669' }}>~{eta}m</span>
+                          <span className="font-medium" style={{ color: '#059669' }}>{eta}</span>
                         )}
                         {eta && <span>·</span>}
                         <span>{order.item_count} item{order.item_count !== 1 ? 's' : ''}</span>

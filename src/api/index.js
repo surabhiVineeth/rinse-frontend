@@ -29,8 +29,11 @@ export const createOrder = (data) => api.post('/api/orders/', data)
 // POST /api/orders/:id/advance/  → valet advances order to next status
 export const advanceOrder = (id) => api.post(`/api/orders/${id}/advance/`)
 
-// POST /api/orders/:id/cancel/   → cancel a scheduled order
+// POST /api/orders/:id/cancel/      → cancel a scheduled order
 export const cancelOrder = (id) => api.post(`/api/orders/${id}/cancel/`)
+
+// POST /api/orders/:id/mark-ready/  → cleaner marks order ready for delivery
+export const markOrderReady = (id) => api.post(`/api/orders/${id}/mark-ready/`)
 
 // ── Valets ────────────────────────────────────────────────────────────────────
 

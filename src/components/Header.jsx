@@ -1,7 +1,8 @@
 const TABS = [
-  { id: 'map',   label: 'Live Map',    icon: '🗺️' },
-  { id: 'order', label: 'Place Order', icon: '➕' },
-  { id: 'valet', label: 'Valet View',  icon: '🚐' },
+  { id: 'map',     label: 'Live Map',    icon: '🗺️' },
+  { id: 'order',   label: 'Place Order', icon: '➕' },
+  { id: 'valet',   label: 'Valet View',  icon: '🚐' },
+  { id: 'cleaner', label: 'Cleaner',     icon: '👕' },
 ]
 
 export default function Header({ activeTab, onTabChange, activeOrders }) {

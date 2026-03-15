@@ -10,9 +10,13 @@ function fmt(ts) {
 }
 
 function fmtETA(seconds) {
-  if (!seconds) return null
-  const mins = Math.round(seconds / 60)
-  return mins < 60 ? `~${mins} min` : `~${Math.round(mins / 60)}h ${mins % 60}m`
+  if (!seconds || seconds < 0) return null
+  const s = Math.round(seconds)
+  if (s < 60) return `${s}s`
+  const m = Math.floor(s / 60)
+  const rem = s % 60
+  if (m < 60) return `${m}:${String(rem).padStart(2, '0')}`
+  return `~${Math.floor(m / 60)}h ${m % 60}m`
 }
 
 const ROUTE_LABEL = {

@@ -44,16 +44,27 @@ function OrderPin({ order, onClick }) {
 function ValetPin({ valet }) {
   return (
     <Marker longitude={valet.longitude} latitude={valet.latitude} anchor="center">
-      <div
-        title={`${valet.name} — ${valet.status_display}`}
-        style={{
-          width: 14, height: 14,
-          background: '#cb6016',
-          border: '2px solid #fff',
-          transform: 'rotate(45deg)',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
-        }}
-      />
+      <div title={`${valet.name} — ${valet.status_display}`} style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {/* Pulsing ring when moving */}
+        {valet.moving && (
+          <div style={{
+            position: 'absolute',
+            inset: -6,
+            borderRadius: '50%',
+            border: '2px solid #cb6016',
+            opacity: 0.6,
+            animation: 'ping 1.2s cubic-bezier(0,0,0.2,1) infinite',
+          }} />
+        )}
+        <div style={{
+          fontSize: 22,
+          lineHeight: 1,
+          filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))',
+          cursor: 'default',
+        }}>
+          🛵
+        </div>
+      </div>
     </Marker>
   )
 }
@@ -169,7 +180,7 @@ export default function MapView({ orders, valets, routeGeometry, onOrderClick })
               </div>
             ))}
           <div className="flex items-center gap-2 mt-1 pt-1.5 border-t border-gray-100">
-            <div style={{ width: 10, height: 10, background: '#cb6016', border: '2px solid #fff', transform: 'rotate(45deg)' }} />
+            <span className="text-sm leading-none">🛵</span>
             <span className="text-xs text-gray-600">Valet</span>
           </div>
           <div className="flex items-center gap-2">
