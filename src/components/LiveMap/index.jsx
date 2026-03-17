@@ -99,11 +99,22 @@ export default function LiveMap({ onOrderCountChange }) {
       try {
         const route = await getRoute(waypoints)
         if (!route?.geometry?.coordinates) return
+
+        // Seed progress from elapsed time so position survives page refresh
+        const lastEvent = order.history?.findLast?.(h => h.status === order.status)
+          ?? order.history?.[order.history.length - 1]
+        const elapsed = lastEvent
+          ? (Date.now() - new Date(lastEvent.timestamp)) / 1000
+          : 0
+        const seedProgress = route.duration_sec
+          ? Math.min(elapsed / route.duration_sec, 0.98)
+          : 0
+
         setOrderRoutes(prev => ({
           ...prev,
           [order.id]: {
             coords:       route.geometry.coordinates,
-            progress:     0,
+            progress:     seedProgress,
             status:       order.status,
             duration_sec: route.duration_sec,
           },
